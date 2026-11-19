@@ -81,8 +81,6 @@
     });
   }
 
-  var enquiry = document.getElementById("enquiry-form");
   var application = document.getElementById("application-form");
-  if (enquiry) bindForm(enquiry);
   if (application) bindForm(application);
 })();
