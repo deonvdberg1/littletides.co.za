@@ -170,6 +170,33 @@ nav a:hover, nav a[aria-current="page"] {
 .btn-primary:hover { background: var(--ocean); border-color: var(--ocean); color: var(--white); }
 .btn-ghost { background: transparent; color: var(--harbour); }
 .btn-ghost:hover { background: var(--white); color: var(--harbour); }
+/* #25D366 fails contrast with white text; use a darker WhatsApp green */
+.btn-whatsapp {
+  gap: 0.4em;
+  background: #0E7A34;
+  color: #fff;
+  border-color: #0E7A34;
+}
+.btn-whatsapp:hover {
+  background: #0B6E30;
+  border-color: #0B6E30;
+  color: #fff;
+}
+.icon-whatsapp {
+  width: 1.2em;
+  height: 1.2em;
+  display: inline-block;
+  vertical-align: -0.2em;
+  flex-shrink: 0;
+}
+.whatsapp-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+}
+.whatsapp-link .icon-whatsapp { color: #25D366; }
+.site-footer .whatsapp-link .icon-whatsapp { color: currentColor; }
+.btn-whatsapp .icon-whatsapp { color: #fff; vertical-align: unset; }
 .btn[disabled], .btn.is-disabled {
   opacity: 0.7;
   cursor: not-allowed;
