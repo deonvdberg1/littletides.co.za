@@ -1,11 +1,10 @@
 (function () {
-  // One-line change: paste Deon's Apps Script web-app URL between the quotes.
-  var FORM_ENDPOINT = "";
+  var FORM_ENDPOINT = "https://littletides-apply.young-tooth-19b1.workers.dev/";
 
   var EMAIL_FALLBACK =
     "Thank you for getting in touch. Please email info@littletides.co.za and we will be glad to help.";
   var SEND_ERROR =
-    "Sorry, we could not send your form just now. Please email info@littletides.co.za and we will be glad to help.";
+    "Sorry, something went wrong sending your application. Please try again, or email info@littletides.co.za or WhatsApp 071 944 5561.";
   var THANKS =
     "Thank you. We have received your form and will be in touch. If you need to reach us sooner, please email info@littletides.co.za.";
 
@@ -53,8 +52,12 @@
 
   function bindForm(form) {
     setupHowHeard(form);
+    var submitBtn = form.querySelector('button[type="submit"]');
+    var sending = false;
+
     form.addEventListener("submit", function (e) {
       e.preventDefault();
+      if (sending) return;
       if (!form.reportValidity()) return;
       if (!form.querySelector('[name="popia_consent"]').checked) {
         showStatus(form, "Please tick the consent box to continue.", "err");
@@ -64,19 +67,41 @@
         showStatus(form, EMAIL_FALLBACK, "err");
         return;
       }
-      var body = payloadFrom(form);
+
+      sending = true;
+      if (submitBtn) submitBtn.disabled = true;
+
       fetch(FORM_ENDPOINT, {
         method: "POST",
-        mode: "no-cors",
-        body: body,
+        mode: "cors",
+        body: payloadFrom(form),
       })
-        .then(function () {
-          showStatus(form, THANKS, "ok");
-          form.reset();
-          setupHowHeard(form);
+        .then(function (res) {
+          return res.text().then(function (text) {
+            var data = null;
+            try {
+              data = text ? JSON.parse(text) : null;
+            } catch (err) {
+              data = null;
+            }
+            return { res: res, data: data };
+          });
+        })
+        .then(function (result) {
+          if (result.res.ok && result.data && result.data.ok === true) {
+            showStatus(form, THANKS, "ok");
+            form.reset();
+            setupHowHeard(form);
+          } else {
+            showStatus(form, SEND_ERROR, "err");
+          }
         })
         .catch(function () {
           showStatus(form, SEND_ERROR, "err");
+        })
+        .then(function () {
+          sending = false;
+          if (submitBtn) submitBtn.disabled = false;
         });
     });
   }
